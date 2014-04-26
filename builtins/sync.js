@@ -2,7 +2,10 @@
  * Created by mschwartz on 4/25/14.
  */
 
+
 function sync (func, obj) {
+    var Lock = Java.type('java.util.concurrent.locks.ReentrantLock');
+
     if (arguments.length < 1 || arguments.length > 2 ) {
         throw "sync(function [,object]) parameter count mismatch";
     }

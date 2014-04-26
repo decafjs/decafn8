@@ -2,7 +2,7 @@
  * Created by mschwartz on 4/25/14.
  */
 
-/*global load, toString */
+/*global load, , require, toString */
 
 var global = this;
 global.__dirname = java.lang.System.getProperty('user.dir');
@@ -14,7 +14,9 @@ Object.defineProperty(Object.prototype, "__lookupGetter__", {
         var obj = this;
         while (obj) {
             var desc = Object.getOwnPropertyDescriptor(obj, name);
-            if (desc) return desc.get;
+            if (desc) {
+                return desc.get;
+            }
             obj = Object.getPrototypeOf(obj);
         }
         return undefined;
@@ -77,10 +79,12 @@ Object.defineProperty(Object.prototype, "__lookupSetter__", {
         return !!o && Object.prototype.toString.call(o) === '[object global]';
     }
 
-    var prefix = java.lang.System.getProperty('decafn8') || '.';
+    var prefix = java.lang.System.getProperty('decaf') || '.';
     prefix += '/';
 
-    global.d = function( o, max, sep, l ) {
+    load(prefix + 'builtins/require.js');
+
+    var d = global.decaf = function( o, max, sep, l ) {
         print(d.print_r(o, max, sep, l));
     };
     d.each = function( o, fn ) {
@@ -117,6 +121,7 @@ Object.defineProperty(Object.prototype, "__lookupSetter__", {
         });
         return me;
     };
+
     d.extend(d, {
         decafn8    : prefix,
         isObject   : isObject,
@@ -134,6 +139,7 @@ Object.defineProperty(Object.prototype, "__lookupSetter__", {
             load(d.decafn8 + 'builtins/' + file);
         },
 
+        print_r: require('./builtins/print_r'),
         toJavaByteArray: function(thing, encoding) {
             if (typeof thing === 'string') {
                 return encoding ? new java.lang.String(thing).getBytes(encoding) : new java.lang.String(thing).getBytes();
@@ -157,9 +163,19 @@ Object.defineProperty(Object.prototype, "__lookupSetter__", {
 
     });
 
-    d.include('print_r.js');
+    global.console = {
+        log: function(s) {
+            java.lang.System.out.println(s);
+        },
+        dir: function(o) {
+            java.lang.System.out.println(d.print_r(o));
+        }
+    };
+
+//    d.include('print_r.js');
+//    d(d.print_x);
     d.include('sync.js');
-
-    d(this);
+    d.extend(d, require('./builtins/atexit'));
+    d.include('shell.js');
+//    d(this);
 }());
-
