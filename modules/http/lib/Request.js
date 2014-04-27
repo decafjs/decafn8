@@ -9,30 +9,30 @@
  * @param {InputStream} is InputStream
  * @param {int} maxUpload maximum bytes allowed for file upload
  */
-function Request(is, maxUpload) {
+function Request( is, maxUpload ) {
     this.is = is;
     maxUpload = maxUpload || (10 * 1024 * 1024); // default max upload is 10M
 
     var line;
 
     line = is.readLine();
-    if (line === false) {
+    if ( line === false ) {
         throw 'EOF';
     }
     // parse 1st line
-    var parts = line.split(/\s+/),
+    var parts = line.split(' '),
         uri = parts[1],
         uriParts = uri.split('?'),
         queryParams = {},
         data = {};
 
-    if (uriParts[1]) {
-        decaf.each(uriParts[1].split('&'), function(part) {
+    if ( uriParts[1] ) {
+        decaf.each(uriParts[1].split('&'), function( part ) {
             part = part.split('=');
             try {
                 queryParams[part[0]] = data[part[0]] = decodeURIComponent(part[1].replace(/\+/g, ' '));
             }
-            catch (e) {
+            catch ( e ) {
 
             }
         });
@@ -74,25 +74,25 @@ function Request(is, maxUpload) {
     // parse headers
     var headers = {};
     var done = false;
-    for (var i = 0; i < 64; i++) {
+    for ( var i = 0; i < 64; i++ ) {
         line = is.readLine();
-        if (line === false) {
+        if ( line === false ) {
             throw 'EOF';
         }
-        if (line.length === 0) {
+        if ( line.length === 0 ) {
             done = true;
             break;
         }
-        parts = line.split(/:\s+/);
+        parts = line.split(': '); // /:\s+/);
         headers[parts[0].toLowerCase()] = parts[1];
     }
-    while (!done) {
+    while ( !done ) {
         line = is.readLine(is);
         // line = inputStream.readLine();
-        if (line === false) {
+        if ( line === false ) {
             throw 'EOF';
         }
-        if (line.length === 0) {
+        if ( line.length === 0 ) {
             done = true;
             break;
         }
@@ -119,7 +119,7 @@ function Request(is, maxUpload) {
 
     var host = 'localhost';
     var port = is.serverPort;
-    if (headers.host) {
+    if ( headers.host ) {
         host = headers.host.split(':');
         port = host[1] || '80';
         host = host[0];
@@ -153,14 +153,14 @@ function Request(is, maxUpload) {
     this.remote_addr = is.remoteAddress();
 
     var cookies = {};
-    if (headers.cookie) {
+    if ( headers.cookie ) {
         try {
-            decaf.each(headers.cookie.split(/;\s*/), function(cookie) {
+            decaf.each(headers.cookie.split(/;\s*/), function( cookie ) {
                 var cookieParts = cookie.split('=');
                 cookies[cookieParts[0]] = data[cookieParts[0]] = decodeURIComponent(cookieParts[1].replace(/\+/g, ''));
             });
         }
-        catch (e) {
+        catch ( e ) {
 
         }
     }
@@ -175,9 +175,9 @@ function Request(is, maxUpload) {
     // process POST data
     var contentLength = headers['content-length'];
 
-    if (contentLength) {
+    if ( contentLength ) {
         contentLength = parseInt(headers['content-length'] || '0', 10);
-        if (contentLength > maxUpload) {
+        if ( contentLength > maxUpload ) {
             throw new Error('413 File upload exceeds ' + maxUpload + ' bytes');
         }
         var post = String(new java.lang.String(is.read(contentLength), 'latin1')),
@@ -185,36 +185,36 @@ function Request(is, maxUpload) {
             contentType = (headers['content-type'] || '');
 
 
-        if (contentType.toLowerCase().indexOf('multipart/form-data') !== -1) {
+        if ( contentType.toLowerCase().indexOf('multipart/form-data') !== -1 ) {
             // handle multipart mime
             var boundary = contentType.replace(/^.*?boundary=/i, '');
             mimeParts = post.split('--' + boundary);
             mimeParts.shift();
             mimeParts.pop();
-            decaf.each(mimeParts, function(part) {
+            decaf.each(mimeParts, function( part ) {
                 part = part.substr(2).slice(0, -2);
                 var line,
                     len,
                     mimePart = {};
 
-                while (true) {
+                while ( true ) {
                     line = part.split('\r\n', 1)[0];
                     len = line.length;
                     part = part.substr(len + 2);
-                    if (len === 0) {
+                    if ( len === 0 ) {
                         break;
                     }
                     var parts = line.split(': '),
                         mimeKey = parts[0],
                         mimeValue = parts[1];
 
-                    switch (mimeKey.toLowerCase()) {
+                    switch ( mimeKey.toLowerCase() ) {
                         case 'content-disposition':
-                            decaf.each(mimeValue.split(/;\s*/), function(disposition) {
+                            decaf.each(mimeValue.split(/;\s*/), function( disposition ) {
                                 var parts = disposition.split('='),
                                     key = parts[0],
                                     value = parts[1];
-                                if (value !== undefined) {
+                                if ( value !== undefined ) {
                                     mimePart[key.toLowerCase()] = value.replace(/"/g, '');
                                 }
                             });
@@ -232,13 +232,13 @@ function Request(is, maxUpload) {
                 data[mimePart.name] = mimePart;
             });
         }
-        else if (contentType.indexOf('application/x-www-form-urlencoded') !== -1) {
-            decaf.each(post.split('&'), function(part) {
+        else if ( contentType.indexOf('application/x-www-form-urlencoded') !== -1 ) {
+            decaf.each(post.split('&'), function( part ) {
                 part = part.split('=');
                 data[part[0]] = decodeURIComponent(part[1].replace(/\+/gm, ' '));
             });
         }
-        else if (contentType.indexOf('application/json') !== -1) {
+        else if ( contentType.indexOf('application/json') !== -1 ) {
             decaf.extend(data, JSON.parse(post));
         }
         else {

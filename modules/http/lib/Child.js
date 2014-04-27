@@ -122,13 +122,11 @@
 						continue;
 					}
                     else {
-                        print('child exception');
-//                        console.dir(e);
                         if (e.stack) {
                             console.log(e.stack);
                         }
                         else {
-                            console.dir(e);
+                            e.printStackTrace();
                         }
                     }
                     keepAlive = false;

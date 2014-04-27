@@ -168,7 +168,7 @@ Object.defineProperty(Object.prototype, "__lookupSetter__", {
             java.lang.System.out.println(s);
         },
         dir: function(o) {
-            java.lang.System.out.println(d.print_r(o));
+            java.lang.System.out.println(decaf.print_r(o));
         }
     };
 

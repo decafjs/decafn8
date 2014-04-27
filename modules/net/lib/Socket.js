@@ -35,7 +35,20 @@ decaf.extend(Socket.prototype, {
      * @returns {string}
      */
     getRemoteSocketAddress: function () {
-        return String(this.socket.getRemoteSocketAddress().getAddress()).replace(/^\//, '');
+        return this.remote_addr;
+//        var remoteAddress = this.socket.getRemoteSocketAddress();
+//        if (remoteAddress) {
+//            remoteAddress = remoteAddress.getAddress();
+//            if (remoteAddress) {
+//                return (''+String(remoteAddress)).replace(/^\//, '');
+//            }
+//            else {
+//                return 'NO REMOTE ADDRESS';
+//            }
+//        }
+//        else {
+//            return "NO REMOTE ADDRESS2";
+//        }
     },
 
     /**
