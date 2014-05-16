@@ -1,6 +1,8 @@
 decafn8
 =======
 
+decafjs core running on top of nashorn
+
 decafn8 is a JavaScript framework for implementing command line programs using the Nashorn JavaScript runtime for the JVM in Java 8.
 
 JavaScript on the JVM has a number of benefits over using a JavaScript runtime implemented for browsers:
