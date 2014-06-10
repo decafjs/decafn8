@@ -111,7 +111,7 @@
             }
         }
         else {
-            var paths = require.path;
+            var paths = require.paths;
             for ( var i = 0, len = paths.length; i < len; i++ ) {
                 var path = paths[i];
                 if ( path.substr(path.length - 1, 1) != '/' ) {
@@ -242,7 +242,7 @@
      * @memberOf global.require
      * @type {Array}
      */
-    require.path = [
+    require.paths = [
         './languages',
         './modules',
         '/usr/local/decafn8',
